@@ -25,6 +25,7 @@ public:
 	}
 	bool getStatus() const { return m_alive;} //returns true if alive, false if dead
 	void setStatus(bool state) { m_alive = state; } //sets objects to dead or alive
+	void virtual doSomething() {};
 private:
 	StudentWorld* m_SW;
 	bool m_alive;  //dead/alive status
@@ -36,6 +37,7 @@ public:
 	RegularProtester(int x, int y) : Actor(5, 100, IID_PROTESTER, x,y, left) {//?? what are x and y?
 		setVisible(true);
 	} 
+	void doSomething();
 };
 class Iceman : public Actor {
 public:
@@ -54,8 +56,8 @@ public:
 	void doSomething();
 
 private: 
-	Water* m_water;
-	int m_waterUnits;
+	Water* m_water; 
+	int m_waterUnits; 
 	Squirt* m_squirt;
 	SonarKit* m_sonar;
 	int m_sonarCharge;
@@ -67,14 +69,18 @@ public:
 	HardcoreProtester(int x, int y) : Actor(20, 100, IID_HARD_CORE_PROTESTER, x, y, left) {//?? what are x and y?
 		setVisible(true);
 	}
-
+	void doSomething();
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////ICE OBJECTS/////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IceObject : public GraphObject {
 public: 
 	IceObject(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0, int ticks = 0)
 		: m_SW(nullptr), m_alive(true), GraphObject(imageID, startX, startY, dir, size, depth) { }
 	int get_ticks() const { return num_ticks; } //returns number of ticks the object has left
+	void virtual doSomething() {}
 private:
 	StudentWorld* m_SW;
 	bool m_alive;  //dead/alive status
@@ -87,6 +93,7 @@ public:
 		m_distance = 4;
 		setVisible(true);
 	}
+	void doSomething();
 private:
 	int m_distance;
 };
@@ -95,12 +102,15 @@ public:
 	Barrel(int x, int y) : IceObject(IID_BARREL, x, y, right, 1.0, 2) {
 		setVisible(false);
 	}
+	void doSomething();
 };
 
 class Boulder : public IceObject {
+public:
 	Boulder(int x, int y) : IceObject(IID_BOULDER, x, y, down, 1.0, 1) {
 		setVisible(true);
 	}
+	void doSomething();
 };
 
 class GoldNugget : public IceObject {
@@ -110,8 +120,9 @@ public:
 		m_pickup = pickup;
 		m_permanent = permanent;
 	}
-	bool isPermanent() const{ return m_permanent; }
-	bool pickupStatus() const{ return m_pickup; }
+	bool isPermanent() const{ return m_permanent; } //returns true if permanent, false if temporary
+	bool pickupStatus() const{ return m_pickup; } //returns true if Iceman can pick up, false if protester can pick up
+	void doSomething();
 private:
 	bool m_pickup; //true if Iceman can pick up nugget, flase if Protester can pick up nugget
 	bool m_permanent; //true if permanent, false if temporary
@@ -123,6 +134,7 @@ public:
 		setVisible(true);
 		//num_ticks = max(100, 300 – 10 * current_level_number)??
 	}
+	void doSomething();
 };
 
 class Water : public IceObject {
@@ -131,12 +143,15 @@ public:
 		setVisible(true);
 		//num_ticks = max(100, 300 – 10*current_level_number)??
 	}
+	void doSomething();
 };
 
 class Ice : public IceObject {
+public:
 	Ice(int x, int y) : IceObject(IID_ICE, x, y, right, 0.25, 3) { 
 		setVisible(true);
 	}
+	void doSomething();
 };
 
 #endif // ACTOR_H_
