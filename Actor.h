@@ -18,66 +18,125 @@
 
 class Actor : public GraphObject {
 public:
-	Actor(int imageID,int startX, int startY) : m_SW(nullptr), m_alive(true) , GraphObject(imageID, startX, startY) {}
-	bool getStatus() const { return m_alive;}
-	void setStatus(bool state) { m_alive = state; }
+	Actor(int hitPoints, int annoy, int imageID,int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0)
+		:  m_SW(nullptr), m_alive(true) , GraphObject(imageID, startX, startY, dir, size, depth)
+	{
+		m_annoy = annoy;
+	}
+	bool getStatus() const { return m_alive;} //returns true if alive, false if dead
+	void setStatus(bool state) { m_alive = state; } //sets objects to dead or alive
 private:
 	StudentWorld* m_SW;
-	bool m_alive;
+	bool m_alive;  //dead/alive status
+	int m_annoy; //annoyance points	
+	int m_hitPoints;
 };
 class RegularProtester : public Actor {
-
+public: 
+	RegularProtester(int x, int y) : Actor(5, 100, IID_PROTESTER, x,y, left) {//?? what are x and y?
+		setVisible(true);
+	} 
 };
 class Iceman : public Actor {
 public:
 
 	//constructor?
-	Iceman() : m_nugget(nullptr), Actor(IID_PLAYER, 30,60) {	//Starts out with zero gold nuggets
+	Iceman() : m_squirt(nullptr), m_nugget(nullptr), Actor(10,100,IID_PLAYER, 30,60) {	//Starts out with zero gold nuggets
 		//constructor stuff
 		//starts at x=30, y=60
 		//Should start facing rightward
 		//It has an image depth of 0 – meaning its graphic image should always be in the foreground(above other images)
 		//It has a size of 1.0
 		m_sonar = new SonarKit;	//Is given 1 sonar charge
-		m_hitPoints = 10;	//Is given 10 hit points
-		for (auto it = m_squirt.begin(); it != m_squirt.end(); it++) {
-			*it = new Squirt;	//Is given 5 units of water to squirt with his squirt gun(he may pick up additional Water)
+		for (auto it = m_water.begin(); it != m_water.end(); it++) {
+			*it = new Water;	//Is given 5 units of water to squirt with his squirt gun(he may pick up additional Water)
 		}
 		setVisible(true); //make Iceman visible
 	}
-
 	void doSomething();
-private: 
 
-	int m_hitPoints;
-	std::vector<Squirt*> m_squirt;
+private: 
+	std::vector<Water*> m_water;
+	Squirt* m_squirt;
 	SonarKit* m_sonar;
 	GoldNugget* m_nugget;
 };
-class HardcoreProtester : public RegularProtester {
+
+class HardcoreProtester : public Actor{
+public:
+	HardcoreProtester(int x, int y) : Actor(20, 100, IID_HARD_CORE_PROTESTER, x, y, left) {//?? what are x and y?
+		setVisible(true);
+	}
 
 };
 
-class Squirt {
-
+class IceObject : public GraphObject {
+public: 
+	IceObject(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0, int ticks = 0)
+		: m_SW(nullptr), m_alive(true), GraphObject(imageID, startX, startY, dir, size, depth) { }
+	int get_ticks() const { return num_ticks; } //returns number of ticks the object has left
+private:
+	StudentWorld* m_SW;
+	bool m_alive;  //dead/alive status
+	int num_ticks;
 };
-class Barrel {
 
+class Squirt : public IceObject{
+public:
+	Squirt(int x, int y, Direction dir) : IceObject(IID_WATER_SPURT, x,y,dir,1.0,1) {
+		m_distance = 4;
+		setVisible(true);
+	}
+private:
+	int m_distance;
 };
-class Boulder {
-
+class Barrel : public IceObject{
+public:
+	Barrel(int x, int y) : IceObject(IID_BARREL, x, y, right, 1.0, 2) {
+		setVisible(false);
+	}
 };
-class GoldNugget {
 
+class Boulder : public IceObject {
+	Boulder(int x, int y) : IceObject(IID_BOULDER, x, y, down, 1.0, 1) {
+		setVisible(true);
+	}
 };
-class SonarKit {
 
+class GoldNugget : public IceObject {
+public:
+	GoldNugget(int ticks, int x, int y, bool visible,bool pickup, bool permanent) : IceObject(IID_GOLD, x, y, right, 1.0, 2, ticks) {
+		setVisible(visible);
+		m_pickup = pickup;
+		m_permanent = permanent;
+	}
+	bool isPermanent() const{ return m_permanent; }
+	bool pickupStatus() const{ return m_pickup; }
+private:
+	bool m_pickup; //true if Iceman can pick up nugget, flase if Protester can pick up nugget
+	bool m_permanent; //true if permanent, false if temporary
 };
-class Water {
 
+class SonarKit : public IceObject {
+public:
+	SonarKit(int x, int y) : IceObject(IID_SONAR, x, y, right, 1.0, 2) {
+		setVisible(true);
+		//num_ticks = max(100, 300 – 10 * current_level_number)??
+	}
 };
-class Ice {
 
+class Water : public IceObject {
+public:
+	Water(int x, int y) : IceObject(IID_WATER_POOL, x, y, right, 1.0, 2) {
+		setVisible(true);
+		//num_ticks = max(100, 300 – 10*current_level_number)??
+	}
+};
+
+class Ice : public IceObject {
+	Ice(int x, int y) : IceObject(IID_ICE, x, y, right, 0.25, 3) { 
+		setVisible(true);
+	}
 };
 
 #endif // ACTOR_H_

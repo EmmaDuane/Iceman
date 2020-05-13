@@ -6,9 +6,15 @@ void Iceman::doSomething() {
 
 
 	//a.The Iceman must check to see if it is currently alive. If not, then its doSomething() method must return immediately
+	if (!getStatus()) { return;}
 	//b.If the Iceman’s 4x4 image currently overlaps any Ice objects within the oil field, 
 		//then it will call upon the StudentWorld object to :
 			//1.Remove / destroy the Ice objects from the 4x4 area occupied by the Iceman(from x, y to x + 3, y + 3 inclusive)
+	for (int x = getX(); x <= getX() + 3; x++) {
+		for (int y = getY(); y <= getY() + 3; y++) {
+
+		}
+	}
 			//2.Make a digging sound by playing the SOUND_DIG sound(see the
 			//StudentWorld section of this document for details on how to play a sound)
 	//c. doSomething() method must check to see if the human player pressed a key
